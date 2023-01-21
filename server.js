@@ -15,13 +15,70 @@ const Handlebars = require("handlebars");
 const template = Handlebars.compile("test: {{name}}");
 console.log(template({ name: "handlebars" }));
 
-// Este es un endpoint de ejemplo
+console.log(toString(path.join(__dirname)));
+console.log(Object.keys(path.join(__dirname)));
+console.log(path.join(__dirname)[1]);
+console.log(path.join(__dirname)=="C:\01 Desarrollo\Node\railway");
+
+var estaUrl = path.join(__dirname);
+console.log(estaUrl);
+console.log(estaUrl == "C:\01 Desarrollo\Node\railway");
+console.log( );
+
+
+var _url = "";
+if(estaUrl[0] == "C" && estaUrl[1] == ":"){
+    _url = "http://localhost:3000";
+}else{
+    _url = "https://railway2-production-725e.up.railway.app/"
+}
+
+//------ Páginas de sistema ------------------
+
+/* 
 app.get('/', (req, res) => {
-    //res.send('Hola mundo!');
+    
     res.sendFile(path.join(__dirname,'/paginas/index.html'));
 });
+*/ 
+ 
 
-//var maquinarias = [{"disponible":true,"agenda":[],"id":"170f489d-4a41-4c27-870d-bf1335c12ff6","nombre":"Desmalezadora Steel"},{"disponible":true,"nombre":"Podadora Cerco Eléctrica","id":"c39e2a99-debf-4aca-bc38-6af877075d13","agenda":[]},{"id":"85e4c45d-89be-427c-adfa-00a5c2e475d1","nombre":"Motosierra Steel","agenda":[],"disponible":true},{"nombre":"test Maquinaria","id":"9ac5ae10-5298-48f5-9c4d-7c36773cd3be","disponible":true,"agenda":[]},{"disponible":false,"nombre":"Cortadora Césped Steel","agenda":[],"id":"cf85ea92-a99d-4227-8d5f-681971e62fa9"}];
+app.get('/', (req, res) => {
+
+    var objeto = {url : _url};
+
+     var archivo = fs.readFileSync('paginas/index.hbs','utf-8',(err,data)=>{
+        if(err){
+            console.log(err);         
+        }else{
+            console.log("archivo leído");
+        }
+    });
+    var template = Handlebars.compile(archivo);
+    var salida = template(objeto);
+    res.send(salida);
+});
+
+app.post('/', (req, res) => {
+    var objeto = {user : req.body.user,
+                    pass: req.body.pass,
+                    rol: "administrador",
+                    submit : req.body.submit};
+     var archivo = fs.readFileSync('paginas/contenedor.hbs','utf-8',(err,data)=>{
+        if(err){
+            console.log(err);         
+        }else{
+            console.log("archivo leído");
+        }
+    });
+    var template = Handlebars.compile(archivo);
+    var salida = template(objeto);
+    res.send(salida);
+});
+
+
+//--- Api ----------------------------------------------------
+
 app.get('/dameMaquinarias',(req,res)=>{
     console.log("--/dameMaquinarias-->[server.js]");
     var maquinarias = [{"disponible":true,"agenda":[],"id":"170f489d-4a41-4c27-870d-bf1335c12ff6","nombre":"Desmalezadora Steel"},{"disponible":true,"nombre":"Podadora Cerco Eléctrica","id":"c39e2a99-debf-4aca-bc38-6af877075d13","agenda":[]},{"id":"85e4c45d-89be-427c-adfa-00a5c2e475d1","nombre":"Motosierra Steel","agenda":[],"disponible":true},{"nombre":"test Maquinaria","id":"9ac5ae10-5298-48f5-9c4d-7c36773cd3be","disponible":true,"agenda":[]},{"disponible":false,"nombre":"Cortadora Césped Steel","agenda":[],"id":"cf85ea92-a99d-4227-8d5f-681971e62fa9"}];
@@ -45,24 +102,7 @@ function agregarMaquinaria(obj){
 }
 
 
-app.post('/', (req, res) => {
-    var objeto = {user : req.body.user,
-                    pass: req.body.pass,
-                    rol: "administrador",
-                    submit : req.body.submit};
-     var archivo = fs.readFileSync('paginas/contenedor.hbs','utf-8',(err,data)=>{
-        if(err){
-            console.log(err);         
-        }else{
-            console.log("archivo leído");
-        }
-    });
- 
-    var template = Handlebars.compile(archivo);
-    var salida = template(objeto);
-    res.send(salida);
 
-});
 
 // Inicie el servidor en el puerto especificado
 app.listen(3000, () => {
