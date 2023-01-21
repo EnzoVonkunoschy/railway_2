@@ -33,7 +33,7 @@
   <body>
      <div class="container">
         <div class="form-group">
-        <form name="login" action="http://localhost:3000" method="post">
+        <form name="login" action='{{url}}' method="post">
           <div class="row">        
             <label for="user">Usuario</label>
             <input type="text" class="form-control" name="user" id="user"/>
@@ -51,6 +51,6 @@
         </form>
       </div>
     </div>
-
+    <script>console.log({{directorio}})</script>
   </body>
 </html>
