@@ -22,7 +22,7 @@ var _url = "";
 if(estaUrl[0] == "C" && estaUrl[1] == ":"){
     _url = "http://localhost:3000";
 }else{
-    _url = "https://railway2-production-725e.up.railway.app/"
+    _url = "https://railway2-production-725e.up.railway.app";
 }
 
 //------ Páginas de sistema ------------------
