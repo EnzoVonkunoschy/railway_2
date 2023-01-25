@@ -2,6 +2,7 @@ const exp = require('constants');
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const Modelo = require('./modelo.js');
 
 const app = express();
 
@@ -15,16 +16,7 @@ const Handlebars = require("handlebars");
 const template = Handlebars.compile("test: {{name}}");
 console.log(template({ name: "handlebars" }));
 
-console.log(toString(path.join(__dirname)));
-console.log(Object.keys(path.join(__dirname)));
-console.log(path.join(__dirname)[1]);
-console.log(path.join(__dirname)=="C:\01 Desarrollo\Node\railway");
-
 var estaUrl = path.join(__dirname);
-console.log(estaUrl);
-console.log(estaUrl == "C:\01 Desarrollo\Node\railway");
-console.log( );
-
 
 var _url = "";
 if(estaUrl[0] == "C" && estaUrl[1] == ":"){
@@ -63,7 +55,8 @@ app.post('/', (req, res) => {
     var objeto = {user : req.body.user,
                     pass: req.body.pass,
                     rol: "administrador",
-                    submit : req.body.submit};
+                    submit : req.body.submit,
+                    url : _url};
      var archivo = fs.readFileSync('paginas/contenedor.hbs','utf-8',(err,data)=>{
         if(err){
             console.log(err);         
@@ -81,25 +74,23 @@ app.post('/', (req, res) => {
 
 app.get('/dameMaquinarias',(req,res)=>{
     console.log("--/dameMaquinarias-->[server.js]");
-    var maquinarias = [{"disponible":true,"agenda":[],"id":"170f489d-4a41-4c27-870d-bf1335c12ff6","nombre":"Desmalezadora Steel"},{"disponible":true,"nombre":"Podadora Cerco Eléctrica","id":"c39e2a99-debf-4aca-bc38-6af877075d13","agenda":[]},{"id":"85e4c45d-89be-427c-adfa-00a5c2e475d1","nombre":"Motosierra Steel","agenda":[],"disponible":true},{"nombre":"test Maquinaria","id":"9ac5ae10-5298-48f5-9c4d-7c36773cd3be","disponible":true,"agenda":[]},{"disponible":false,"nombre":"Cortadora Césped Steel","agenda":[],"id":"cf85ea92-a99d-4227-8d5f-681971e62fa9"}];
-    res.status(200).send(maquinarias);
+    //var maquinarias = [{"disponible":true,"agenda":[],"id":"170f489d-4a41-4c27-870d-bf1335c12ff6","nombre":"Desmalezadora Steel"},{"disponible":true,"nombre":"Podadora Cerco Eléctrica","id":"c39e2a99-debf-4aca-bc38-6af877075d13","agenda":[]},{"id":"85e4c45d-89be-427c-adfa-00a5c2e475d1","nombre":"Motosierra Steel","agenda":[],"disponible":true},{"nombre":"test Maquinaria","id":"9ac5ae10-5298-48f5-9c4d-7c36773cd3be","disponible":true,"agenda":[]},{"disponible":false,"nombre":"Cortadora Césped Steel","agenda":[],"id":"cf85ea92-a99d-4227-8d5f-681971e62fa9"}];
+    
+    Modelo.dameMaquinarias().
+    then((maq)=>res.status(200).send(maq));
 });
-
-
-
 
 app.post('/agregarMaquinaria',(req,res)=>{
    
     console.log(req.body);
-    agregarMaquinaria(req.body);
+    Modelo.agregarMaquinaria(req.body.nombre);
     res.status(200).send(req.body);
 });
 
-function agregarMaquinaria(obj){
-    console.log("--agregarMaquinaria(obj)-->[server.js]");
-    var miMaqui = new Maquinaria(obj.nombre);
-    console.log(miMaqui);
-}
+app.post('/eliminar',(req,res)=>{
+    console.log(req.body);
+    Modelo.eliminarMaquinaria(req.body);
+});
 
 
 
