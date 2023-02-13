@@ -1,102 +1,228 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
+  <head>
+      <meta charset="UTF-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous">
 
 
-    <title>Document</title>
-</head>
-<body>
-    <script>console.log("contenedor.hbs");</script>
+      <title>Capataz</title>
+  </head>
+  <body>
+    <div name="pasaje_variables">
+      <!-- paso las variables usuario y rol -->
+      <label id='user'  hidden value={{user}} >{{user}}  </label>
+      <label id='rol'   hidden  value={{rol}}  >{{rol}}   </label>
+      <label id='f_url' hidden  value={{url}}>{{url}} </label>
+      <script>
+        var usuariof = {};
+        usuariof.user = document.getElementById('user').getAttribute("value");
+        usuariof.rol = document.getElementById('rol').getAttribute("value");
+        usuariof.f_url = document.getElementById('f_url').getAttribute("value");
+      </script>
+    </div>
 
-    <pre>Respuesta desde el servidorxxx:</pre>
-    <p>{{user}}</p>
-    <p>{{pass}}</p>
-    <p>{{submit}}</p>
-    <p>{{url}}</p>
-
-
-  <div name="pasaje_variables">
-    <!-- paso las variables usuario y rol -->
-    <label id='user'    value={{user}} >{{user}}  </label>
-    <label id='rol'     value={{rol}}  >{{rol}}   </label>
-    <label id='f_url'   value={{url}}>{{url}} </label>
-    <script>
-    var usuariof = {};
-    usuariof.user = document.getElementById('user').getAttribute("value");
-    usuariof.rol = document.getElementById('rol').getAttribute("value");
-    usuariof.f_url = document.getElementById('f_url').getAttribute("value");
-    console.table(usuariof);
-    </script>
-  </div>
-
-    <!--?!=include('js_generador.html') ?-->
-<script>
-  function dameDia(fecha_in){
-    let fecha = new Date(fecha_in);
-    const weekday = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
-    let day = weekday[fecha.getDay()];
-    let meses = ["enero","febrero", "marzo","abril","mayo","junio","julio","agosto","setiembre","octubre","noviembre","diciembre"];
-    day = day +" "+fecha.getDate();
-    day = day +" "+ meses[fecha.getMonth()];
-    return day;
-  }
-
-  function desplegar(btn_x){
-    var btn_menu = ['control','eliminar','tecnica','intervencion','intervenciones'];
-    for(var i=0 ;i<btn_menu.length ; i++){
-      if(btn_menu[i] != btn_x){
-        console.log("-->"+btn_menu[i]);
-        document.getElementById(btn_menu[i]).classList.remove('show');        
-      }
-    }
-  }
-
-
-  function mismoDia(fecha1, fecha2){
-    if(fecha1.getFullYear() == fecha2.getFullYear() && fecha1.getMonth()    == fecha2.getMonth() && fecha1.getUTCDate()  == fecha2.getUTCDate()){
-        return true;
-      }else{
-        return false;
-      }
-  }
-
-  function onSuccess(){
-    console.log("--onSuccess()-->[js_Contenedor]");
     
-  }
+    <div name="js_generador">
+      <!--?!=include('js_generador.html') ?-->
+      <script>
+        // Nexo 28 01 Técnica
+        function dameCheckList(colObj,name){
+          var rtn = "";
+          for(var i=0 ; i<colObj.length ; i++){
+            rtn += "<li class='list-group-item'><input type='checkbox' class='form-check-input' name='"+
+              name+"' value='valor'><label>&nbsp;"+colObj[i].nombre+"</label></li>";
+          }
+          return "<ul class='list-group'>"+rtn+"</ul>";
+        }
 
-  function onFailure(){
-    console.log("--onFailure()-->[js_Contenedor]");
-  }
+        function dameCheckListMarcada(colObj, name, colCom){
+          var nuevaCol = [];
+          var esta;
+          for(var i=0 ; i<colObj.length ; i++){
+            esta = false;
+            for(var j=0 ; j<colCom.length ; j++){
+              if(colObj[i].id == colCom[j].id){
+                colCom[j].ausente = false;
+                nuevaCol.push(colCom[j]);
+                esta = true;
+              }
+            }
+            if(!esta){
+              colObj[i].ausente = true;
+              nuevaCol.push(colObj[i])
+            };
+          }
+          colObj = nuevaCol;
+          var rtn = "";
+          for(var i=0 ; i<colObj.length ; i++){
+            if(!colObj[i].ausente){
+              if(colObj[i].disponible){
+                rtn += "<li class='list-group-item'><input type='checkbox' class='form-check-input' name='"+name+"' value='valor'><label>&nbsp;"+colObj[i].nombre+"</label></li>";        
+              }else{
+                rtn += "<li style='background-color: red;' class='list-group-item'><input type='checkbox' class='form-check-input' name='"+name+"' value='valor'><label>&nbsp;"+colObj[i].nombre+"</label></li>";                
+              }
+            }else{
+              rtn += "<li class='list-group-item'><input type='checkbox' class='form-check-input' name='"+name+"' value='valor'><label>&nbsp;"+colObj[i].nombre+"</label></li>";            
+            }
 
-  function repetido(colecc, id){
-    console.log("-- repetido(colecc, id)-->[js_Contenedor]");
-    var fil_colecc = colecc.filter(x => x.id == id);
-    if(fil_colecc.length>0){
-      return true;
-    }else{
-      return false;
-    }
-  }
+          }
+          return "<ul class='list-group'>"+rtn+"</ul>";
+        }
 
-  function eliminar(colecc, id){
-    console.log("-- eliminar(colecc, id)-->[js_Contenedor]");
-    var fil_colecc = colecc.filter(x => x.id != id);
-    return fil_colecc;
-  }
+        function dameLista(colObj){
+          var rtn = "";
+          for(var i=0 ; i<colObj.length ; i++){
+            rtn += "<li class='list-group-item'>"+colObj[i].nombre+"</li>";
+          }
+          return "<ul class='list-group'>"+rtn+"</ul>";
+        }
+
+        function dameListaMarcada(colObj,colCom){
+          console.log("--dameListaMarcada(colObj,colCom)-->[js_generador.html]")
+          console.log(colObj);
+          console.log(colCom);
+          var nuevaCol = [];
+          var esta;
+          for(var i=0 ; i<colObj.length ; i++){
+            esta = false;
+            for(var j=0 ; j<colCom.length ; j++){
+              if(colObj[i].id == colCom[j].id){
+                colCom[j].ausente = false;
+                nuevaCol.push(colCom[j]);
+                esta = true;
+              }
+            }
+            if(!esta){
+              colObj[i].ausente = true;
+              nuevaCol.push(colObj[i]);
+            }
+          }
+          /* */  
+          console.log(nuevaCol);
+          var rtn = "";
+          for(var i=0 ; i<nuevaCol.length ; i++){
+            if(!nuevaCol[i].ausente){
+              if(nuevaCol[i].disponible == true){
+                rtn += "<li class='list-group-item'>"+nuevaCol[i].nombre+"</li>"; 
+              }else{
+                rtn += "<li style='background-color: red;' class='list-group-item'>"+nuevaCol[i].nombre+"</li>";
+              }
+            }else{
+              rtn += "<li  style='color: white; background-color: black;' class='list-group-item'>"+nuevaCol[i].nombre+"</li>";
+            }
+          }
+          return "<ul class='list-group'>"+rtn+"</ul>";;
+                  
+        }
+
+        function fg_dameTodo(){
+          google.script.run.withSuccessHandler(fg_repartir).dameTodo();
+        }
+
+          var vg_maqui = [];
+          var vg_usua = [];
+          var vg_tare = [];
+          var vg_inter = [];
+          var vg_capa = [];
+
+        function fg_repartir(repData){
+          console.log("--fg_repartir(repData)-->[js_generador.html]");
+          vg_maqui = repData[0];
+          vg_usua = repData[1];
+          vg_tare = repData[2];
+          vg_inter = repData[3];
+          vg_capa = usua.filter(x => x.rol == 'capataz');
+        }
+
+      </script>
+    </div>
+
+    <script>
+      function dameDia(fecha_in){
+        let fecha = new Date(fecha_in);
+        const weekday = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+        let day = weekday[fecha.getDay()];
+        let meses = ["enero","febrero", "marzo","abril","mayo","junio","julio","agosto","setiembre","octubre","noviembre","diciembre"];
+        day = day +" "+fecha.getDate();
+        day = day +" "+ meses[fecha.getMonth()];
+        return day;
+      }
+
+      /*  Nexo 08-02-23 01  */
+      console.log("-----------      --------------");
+      var btn_menu = [];
+      document.addEventListener("DOMContentLoaded", function() {
+        console.log(document.getElementsByName('btn_menu').length);
+        var miNodeList = document.getElementsByName('btn_menu');
+        for(var i=0 ; i<miNodeList.length ; i++){
+          console.log(miNodeList[i].id);
+          btn_menu.push(miNodeList[i].id)
+        }
+        });
+  
+      // Nexo 31 02
+      function desplegar(btn_x){
+        //fl_tec_Limpiar() Limpia técnica para que no quede desplegado.
+        var bot_sec = {};
+        bot_sec['btn_control']='control';
+        bot_sec['btn_eliminar']='eliminar';
+        bot_sec['btn_tecnica']='tecnica';      
+        bot_sec['btn_+_intervencion']='intervencion';
+        bot_sec['btn_intervenciones']='intervenciones';
 
 
-</script>
+        //var btn_menu = ['control','eliminar','tecnica','intervencion','intervenciones'];
+        for(var i=0 ;i<btn_menu.length ; i++){
+          if(btn_menu[i] != btn_x){
+            console.log("-->"+btn_menu[i]);
+            document.getElementById(bot_sec[btn_menu[i]]).classList.remove('show');        
+          }
+        }
+      } 
 
-<!--?!=include('temp_header.html') ?-->
+
+      function mismoDia(fecha1, fecha2){
+        if(fecha1.getFullYear() == fecha2.getFullYear() && fecha1.getMonth()    == fecha2.getMonth() && fecha1.getUTCDate()  == fecha2.getUTCDate()){
+            return true;
+          }else{
+            return false;
+          }
+      }
+
+      function onSuccess(){
+        console.log("--onSuccess()-->[js_Contenedor]");
+        
+      }
+
+      function onFailure(){
+        console.log("--onFailure()-->[js_Contenedor]");
+      }
+
+      function repetido(colecc, id){
+        console.log("-- repetido(colecc, id)-->[js_Contenedor]");
+        var fil_colecc = colecc.filter(x => x.id == id);
+        if(fil_colecc.length>0){
+          return true;
+        }else{
+          return false;
+        }
+      }
+
+      function eliminar(colecc, id){
+        console.log("-- eliminar(colecc, id)-->[js_Contenedor]");
+        var fil_colecc = colecc.filter(x => x.id != id);
+        return fil_colecc;
+      }
+
+    </script>
+
     <header>
         <div class="row">
-        <!-- Nexo descomentar
-        <img src="https://docs.google.com/drawings/d/e/2PACX-1vT2tXb9NJ8n7mxhwEexCkblNDlZxLf60zLYgKGdKQTHqvxhuMn_roKTm2mpOPeRH0XxVisUx9IEcEAy/pub?w=929&amp;h=221">  -->
+        <!-- Nexo descomentar -->
+        <!--img src="https://docs.google.com/drawings/d/e/2PACX-1vT2tXb9NJ8n7mxhwEexCkblNDlZxLf60zLYgKGdKQTHqvxhuMn_roKTm2mpOPeRH0XxVisUx9IEcEAy/pub?w=929&amp;h=221"--> 
+        <img src="images/header_back.gif" alt="imagen de parques y bosques"> 
         <h1>Espacios Verdes</h1>
         </div>
     </header>
@@ -109,775 +235,980 @@
         text-align : center;
         }
     </style>
-<!-- -->
-
-
-
+  
     <div class="container">
 
-<!-- Usuario y rol ------------------------->
-<h3>
-  Usuario&nbsp;{{user}}&nbsp;
-  <strong>&nbsp;{{rol}}</strong>
-</h3>
+      <!-- Usuario y rol ------------------------->
+      <h3>
+        Usuario&nbsp;{{user}}&nbsp;
+        <strong>&nbsp;{{rol}}</strong>
+      </h3>
 
-<!-- paso las variables usuario y rol 
-<label id='user' hidden value=<?=usuariof.user?>><?=usuariof.user?> </label>
-<label id='rol'  hidden value=<?=usuariof.rol?>><?=usuariof.rol?> </label>
-<script>
-var usuariof = {};
-usuariof.user = document.getElementById('user').getAttribute("value");
-usuariof.rol = document.getElementById('rol').getAttribute("value");
-</script>-->
+      <!-- Botón Control ------------------------ -->
+      <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="collapse" id='btn_control'        name='btn_menu'  data-bs-target="#control">Control</button>
+      <script>  document.getElementById('btn_control').addEventListener('click',function(){desplegar('btn_control')});</script>
 
 
-<div name="botonControl">
-  <!-- Botón Control ------------------------ -->
-  <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="collapse" id='btn_control'        name='btn_menu'  data-bs-target="#control">Control</button>
-  <script>  document.getElementById('btn_control').addEventListener('click',function(){desplegar('control')});</script>
-</div>
-
-<div name="botonBorrar">
-  <!--? if(usuariof.rol == "administrador"){ ?-->  
-  {{#ifeq rol "administrador"}}      
-  <!-- Botón Eliminar ------------------------->
-  <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="collapse" id='btn_eliminar' name='btn_menu' data-bs-target="#eliminar" onclick="eliminarx()"b>Eliminar</button>
-  <script>  document.getElementById('btn_eliminar').addEventListener('click',function(){desplegar('eliminar')});</script>
-  {{/ifeq}}
-  <!--? } ?-->
-</div>
-
-<? if(usuariof.rol == "administrador" || usuariof.rol == "mecánico"){ ?>
-<!-- Botón Técnica ----------------------->
-<button type="button" class="btn btn-success btn-lg" data-bs-toggle="collapse" id='btn_tecnica'        name='btn_menu' data-bs-target="#tecnica" >Técnica</button>
-<script>document.getElementById('btn_tecnica').addEventListener('click',function(){desplegar('tecnica')});</script>
-<? } ?> 
-
-<? if(usuariof.rol == "administrador"){ ?>
-<!-- Botón + Intervención --------------------->
-<button type="button" class="btn btn-warning btn-lg" data-bs-toggle="collapse" id="btn_+_intervencion" name='btn_menu' data-bs-target="#intervencion" >+ Intervención</button>
-<script>  document.getElementById('btn_+_intervencion').addEventListener('click',function(){desplegar('intervencion')});</script>
-<? } ?>  
-
-<? if(usuariof.rol == "administrador" || usuariof.rol == "capataz" || usuariof.rol == "mecánico"){ ?> 
-<!-- Botón Intervenciones --------------------->
-<button type="button" class="btn btn-warning btn-lg" data-bs-toggle="collapse" id="btn_intervenciones" name='btn_menu' data-bs-target="#intervenciones" onclick="btn_listar()">Intervenciones</button>
-<script> document.getElementById('btn_intervenciones').addEventListener('click',function(){desplegar('intervenciones')});</script>
-<? } ?>
-
-<!-- Botón Salir ----------------------------->
-<!--a class="btn" type="Button" href=<?= ScriptApp.getService().getUrl(); ?>>Salir</a-->
-<a class="btn btn-outline-danger" type="Button" href='https://sites.google.com/view/lasherasespaciosverdes/inicio'>Salir</a>
-
-<!-- Sección Control  -------------------------->
-<div id="control" class="collapse">
+      <!-- Botón Eliminar ------------------------->
+      {{#if permiso1}}      
+      <button type="button" class="btn btn-danger btn-lg" data-bs-toggle="collapse" id='btn_eliminar' name='btn_menu' data-bs-target="#eliminar" onclick="eliminarx()"b>Eliminar</button>
+      <script>  document.getElementById('btn_eliminar').addEventListener('click',function(){desplegar('btn_eliminar')});</script>
+      {{/if}}
 
 
-  <div name="maquinariaNueva">
-    {{#ifeq rol "administrador"}}
-        <p>Aquí va maquinariaNueva.html</p>
-        <hr>
-        <div class="form-group">
-        <div class="row">
+      <!-- Botón Técnica ----------------------->
+      {{#if permiso3}}
+      <button type="button" class="btn btn-success btn-lg" data-bs-toggle="collapse" id='btn_tecnica'        name='btn_menu' data-bs-target="#tecnica" >Técnica</button>
+      <script>document.getElementById('btn_tecnica').addEventListener('click',function(){desplegar('btn_tecnica')});</script>
+      {{/if}}
+
+      <!-- Botón + Intervención --------------------->
+      {{#if permiso1}}
+      <button type="button" class="btn btn-warning btn-lg" data-bs-toggle="collapse" id="btn_+_intervencion" name='btn_menu' data-bs-target="#intervencion" >+ Intervención</button>
+      <script>  document.getElementById('btn_+_intervencion').addEventListener('click',function(){desplegar('btn_+_intervencion')});</script>
+      {{/if}}
+
+      <!-- Botón Intervenciones --------------------->
+      {{#if permiso2}}
+      <button type="button" class="btn btn-warning btn-lg" data-bs-toggle="collapse" id="btn_intervenciones" name='btn_menu' data-bs-target="#intervenciones" onclick="btn_listar()">Intervenciones</button>
+      <script> document.getElementById('btn_intervenciones').addEventListener('click',function(){desplegar('btn_intervenciones')});</script>
+      {{/if}}
+
+      <!-- Botón Salir ----------------------------->
+      <a class="btn btn-outline-danger" type="Button" href= {{url}} >Salir</a>
+
+      <!-- Sección Control  -------------------------->
+
+      <div id="control" class="collapse">
+
+        <div name="maquinariaNueva">
+          {{#if permiso1}}    
+          
+            <hr>
+            <div class="form-group">
+              <div class="row">
+                  <div class="col-sm-8">
+                      <label for="input_maquinariaNueva">Nueva Maquinaria</label>
+                      <input type="text" class="form-control" id="input_maquinariaNueva" />
+                  </div>
+                  <div class="col-sm-4">
+                      <br>
+                      <button onclick="maquinariaNueva()" class="form-control btn btn-success">Agregar</button>
+                  </div>
+              </div>
+            </div>
+
+            <script>
+
+            function maquinariaNueva(){
+                console.log("--maquinariaNueva()-->[maquinariaNueva]");
+                var maq = document.getElementById('input_maquinariaNueva').value;
+
+                var objMaq = {nombre : maq};
+                var strObjMaq = JSON.stringify(objMaq);
+
+                fetch(usuariof.f_url+'/agregarMaquinaria' ,{
+                    method: 'POST',
+                    body: strObjMaq,
+                    headers:{'Content-Type': 'application/json'}
+                })
+                .then(()=>{
+                  retornoBorrar();
+                  document.getElementById("input_maquinariaNueva").value = "";
+                });
+                // Nexo 25 agrego retorno
+            }
+
+            function limpiarInput(){
+                console.log("--limpiarInput()-->[maquinariaNueva]");    
+                document.getElementById('input_maquinariaNueva').value = "";
+                if(desplegado == true){
+                replegarMaquinaria();
+                maquinariaListar();
+                }
+            }
+            </script>
+
+          {{/if}} 
+        </div>
+
+        <!-- Listar maquinaria ---------------------------- -->  
+        
+        <div name="maquinariaListar">          
+            <br>
+            <div class="row">
+                <div class="col-sm-8">
+                    <button onclick="maquinariaListar()" class="form-control btn btn-success" >Listar Maquinaria</button>
+                </div>
+                <div id="maquinariaListar_out"></div>
+            </div>
+
+            <script>
+
+            var data_sele_maquinaria = [];  // Maquinara seleccionada para ser elimnada
+            var data_maquinaria = [];       // Colección Maquinaria
+            var desplegado = false;
+
+            function maquinariaListar(){
+                console.log("--maquinariaListar() -->[maquinariaListar]");
+                if(desplegado == false){
+                    document.getElementById('maquinariaListar_out').innerHTML = "<div class='spinner-border text-warning'></div>"
+                    //google.script.run.withSuccessHandler(listarMaquinaria).dameMaquinarias();
+                    fetch(usuariof.f_url+'/dameMaquinarias')
+                    .then(data=>data.json())
+                    .then(data=>{
+                          data.sort(function(a,b){
+                          if(a.nombre<b.nombre){
+                            return -1;
+                          }else if(a.nombre>b.nombre){
+                            return 1;
+                          }else{
+                            return 0;
+                          }
+                        });
+                      listarMaquinaria(data)});
+                    desplegado = true;
+                }else{
+                    //document.getElementById('maquinariasListar_out').innerHTML = "";
+                    replegarMaquinaria();
+                    desplegado = false; 
+                }
+            }
+
+            function listarMaquinaria(data){
+                console.log("-- listarMaquinaria(data)-->[maquinariaListar()]");
+                console.log(data);
+                data_maquinaria = data;
+                //if(!desplegado){
+                    var str = "";
+                    for(var i=0 ; i<data.length ; i++){
+                        str = str + "<label><input type='checkbox' class='form-check-input' name='maquinaria' onclick='maquinaria("+i+")'>"+data[i].nombre+"</label><hr>";
+                    }
+                    document.getElementById('maquinariaListar_out').innerHTML = str;
+                  
+                /*}else{
+                    replegarMaquinaria();
+                    
+                };*/
+            }
+
+            function replegarMaquinaria(){
+                console.log("-- replegarMaquinaria()-->[maquinariaListar]");
+                document.getElementById('maquinariaListar_out').innerHTML = "";
+                data_sele_maquinaria = [];
+                
+            }
+
+            function maquinaria(A){
+                console.log("-- maquinaria(A)-->[maquinariaListar]")
+                // A posición seleccionada del vector data_maquinaria
+                // Si el id de la posición A no está repetido en el vector data_sele_maquinaria,
+                // lo agrega, sinó lo borra
+                if(!repetido(data_sele_maquinaria, data_maquinaria[A].id)){
+                data_sele_maquinaria.push(data_maquinaria[A])      
+                }else{
+                data_sele_maquinaria = eliminar(data_sele_maquinaria,data_maquinaria[A].id);
+                }
+            }
+
+            </script>
+        </div>
+
+        <!-- --------------------------------------------------------- -->
+
+        <div name="usuarioNuevo">
+          {{#if permiso1}}
+          <hr>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-4">
+                <label for="input_usuarioNuevo">Nuevo Usuario</label>
+                <input type="text" class="form-control" id="input_usuarioNuevo" />
+              </div>
+              <div class="col-sm-4">
+                <label for="rol2">Rol</label>        
+                <select class="form-select" name="rol2" id="rol2">
+                  <option value=""></option>          
+                  <option value="administrador">Administrador</option>
+                  <option value="capataz">Capataz</option>
+                  <option value="mecánico">Mecánico</option>
+                  <option value="invitado">Invitado</option>
+                </select>
+              </div>
+              <div class="col-sm-4">
+                <label for="input_usuarioNuevo_pass">Contraseña</label>
+                <input type="text" class="form-control" id="input_usuarioNuevo_pass" />
+              </div>      
+              <div class="col-sm-12">
+                <br>
+                <button onclick="usuarioNuevo()" class="form-control btn btn-success">Agregar</button>
+              </div>
+            </div>
+          </div>
+
+          <script>
+
+          function usuarioNuevo(){
+            console.log("--usuarioNuevo()-->[usuarioNuevo]");
+            var in_usu = document.getElementById('input_usuarioNuevo').value;
+            var in_rol = document.getElementById('rol2').value;
+            var in_pass = document.getElementById('input_usuarioNuevo_pass').value;
+            console.log(in_usu,in_rol,in_pass);
+
+            if(in_usu != "" && in_rol != "" && in_pass != ""){
+              var usu = {};
+              usu.user = in_usu;
+              usu.pass = in_pass;
+              usu.rol = in_rol;
+              console.log(usu);
+              //google.script.run.withSuccessHandler(limpiarInputUsuario).agregarUsuario(usu);
+                  fetch(usuariof.f_url+'/agregarUsuario' ,{
+                      method: 'POST',
+                      body: JSON.stringify(usu),
+                      headers:{'Content-Type': 'application/json'}
+                  })
+                  .then(()=>{
+                    retornoBorrar();
+                    document.getElementById("input_usuarioNuevo").value = "";
+                  });
+
+            }else{
+              alert("Debe completar todos los campos!");
+            }
+            limpiarInputUsuario();
+
+          }
+
+          function limpiarInputUsuario(){
+            console.log("--limpiarInputUsuario()-->[usuarioNuevo]");
+            document.getElementById('input_usuarioNuevo').value = "";
+            document.getElementById('rol2').value = "";
+            document.getElementById('input_usuarioNuevo_pass').value = "";
+          }
+          </script>
+          {{/if}}
+        </div>
+
+        <div name="usuarioListar">
+          <br>
+          <div class="row">
             <div class="col-sm-8">
-                <label for="input_maquinariaNueva">Nueva Maquinaria</label>
-                <input type="text" class="form-control" id="input_maquinariaNueva" />
+              <button onclick="usuarioListar()" class="form-control btn btn-success" >Listar Usuarios</button>
+            </div>
+            <div id="usuarioListar_out"></div>
+          </div>
+
+          <script>
+            var vl_lu_desplegado = false;
+            var data_sele_usuarios = [];
+
+            function usuarioListar(){
+              console.log("-- usuarioListar()-->[usuarioListar]");
+              if(vl_lu_desplegado == false){
+                document.getElementById('usuarioListar_out').innerHTML = "<div class='spinner-border text-warning'></div>";
+
+                fetch(usuariof.f_url+'/dameUsuarios')
+                .then(data=>data.json())
+                .then((data)=>{
+                  data.sort(function(a,b){if(a.user<b.user){return -1;}else if(a.user>b.user){return 1;}else{return 0};});
+                  listarUsuario(data)
+                });
+                vl_lu_desplegado = true;          
+              }else{
+                replegarUsuarios();
+                vl_lu_desplegado = false;                   
+              }
+            }
+
+            function listarUsuario(data){
+              console.log("-- listarUsuario(data)-->[usuarioListar()]");
+              console.log(data);
+              data_usuarios = data;
+              var str = "";
+              for(var i=0 ; i<data.length ; i++){
+                str = str + "<hr><label><input type='checkbox' class='form-check-input' name='usuario' onclick='usuario("+i+")'>&nbsp;"+data[i].user+"&nbsp;rol:&nbsp;"+data[i].rol+"</label>";
+              }
+              document.getElementById('usuarioListar_out').innerHTML = str;
+
+
+            }
+
+            function replegarUsuarios(){
+              console.log("-- replegarUsuarios()-->[usuarioListar]");
+              document.getElementById('usuarioListar_out').innerHTML = "";
+              data_sele_usuarios = [];
+              vl_lu_desplegado = false; 
+            }
+
+            function usuario(A){
+              console.log("-- usuario(A)-->[usuarioListar]")
+              // A posición seleccionada del vector data_usuarios
+              // Si el id de la posición A no está repetido en el vector data_sele_usuarios,
+              // lo agrega, sinó lo borra
+              if(!repetido(data_sele_usuarios, data_usuarios[A].id)){
+                data_sele_usuarios.push(data_usuarios[A])     
+              
+              }else{
+                data_sele_usuarios = eliminar(data_sele_usuarios,data_usuarios[A].id);
+              }
+                console.log(data_sele_usuarios);    
+            }
+
+          </script>
+        </div>   
+
+        <div name="tareaNueva">
+          {{#if permiso1}}
+          <hr>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-8">
+                <label for="input_tareaNueva">Nueva Tarea</label>
+                <input type="text" class="form-control" id="input_tareaNueva" />
+              </div>
+              <div class="col-sm-4">
+                <br>
+                <button onclick="tareaNueva()" class="form-control btn btn-success">Agregar</button> 
+              </div>
+            </div>
+          </div>
+      
+          <script>
+
+            function tareaNueva(){
+              console.log("--tareaNueva() -->[tareaNueva]");
+
+              var obj = {};
+              var tar = document.getElementById('input_tareaNueva').value;
+              obj.nombre = tar;
+
+              // Nexo 27 01 tareaNueva
+              fetch(usuariof.f_url+'/agregarTarea',{
+                method : 'POST',
+                body : JSON.stringify(obj),
+                headers : {'Content-Type': 'application/json', 'duenio': 'Lucas'}
+              })
+              .then(limpiarInputTarea());
+
+            }
+
+            function limpiarInputTarea(){
+              console.log("-- limpiarDespliegues()-->[tareaNueva]");
+              document.getElementById("input_tareaNueva").value = "";
+              if(desplegado_tarea == true){
+                replegarTarea();
+                tareaListar();
+              }
+
+              listarMaquinaria("");
+              document.getElementById("input_tareaNueva").value = "";
+            }
+          </script>
+          {{/if}}
+        </div>
+
+        <div name="tareaListar">
+          <br>
+          <div class="row">
+            <div class="col-sm-8">
+              <button onclick="tareaListar()" class="form-control btn btn-success" >Listar Tarea</button>
+            </div>
+            <div id="tareaListar_out"></div>
+          </div>
+
+          <script>
+
+            var data_sele_tarea = [];
+            var data_tarea = [];
+            var desplegado_tarea = false;  
+
+            function tareaListar(){
+              console.log("-- tareaListar()-->[tareaListar()]");
+              if(!desplegado_tarea){
+                document.getElementById('tareaListar_out').innerHTML = "<div class='spinner-border text-warning'></div>"
+                //google.script.run.withSuccessHandler(listarTarea).dameTareas();
+                fetch(usuariof.f_url+'/dameTodo')
+                .then(data=>data.json())          
+                .then((data)=>{
+                  data.tarea.sort(function(a,b){if(a.nombre<b.nombre){return -1;}else if(a.nombre>b.nombre){return 1;}else{return 0};});
+                  listarTarea(data.tarea)
+                });
+
+
+
+              /*  .then(data=>console.log(data));*/  
+
+              }else{
+                listarTarea();
+              }
+            }
+
+            function listarTarea(data){
+              console.log("-- listarTarea(data)-->[tareaListar()]");
+              console.log(data);
+              data_tarea = data;
+              if(!desplegado_tarea){
+                var str = "";
+                for(var i=0 ; i<data.length ; i++){
+                  str = str + "<label><input type='checkbox' name='tarea' class='form-check-input' onclick='tarea("+i+")'>"+data[i].nombre+"</label><hr>";
+                }
+                document.getElementById('tareaListar_out').innerHTML = str;
+                desplegado_tarea = true;
+              }else{
+                document.getElementById('tareaListar_out').innerHTML = "";
+                desplegado_tarea = false;
+              }
+
+            }
+
+            function replegarTarea(){
+              console.log("-- replegarTarea()-->[tareaListar]")
+              document.getElementById("tareaListar_out").innerHTML = "";
+              data_sele_tarea = [];
+              desplegado_tarea = false;
+            }
+
+            function tarea(A){
+              console.log("-- tarea(A)-->[tareaListar()]");
+              if(!repetido(data_sele_tarea, data_tarea[A].id)){
+                data_sele_tarea.push(data_tarea[A])      
+              }else{
+                data_sele_tarea = eliminar(data_sele_tarea,data_tarea[A].id);
+              }
+            }
+
+          </script>
+        </div>
+
+      </div>
+
+      <!-- Sección Eliminar -------------------------->
+      <div name="eliminar">
+        {{#if permiso1}}
+        <div id="eliminar" class="collapse">
+        <p>Contenido de eliminar</p>
+          
+        <script>
+
+          var para_eliminar = [];
+          // Nexo 26 01 eliminar usuario
+          function eliminarx(){
+            console.log("-- eliminarx()-->[controlEliminar]")
+
+            if(data_sele_maquinaria.length>0){
+              for(var i=0 ; i<data_sele_maquinaria.length ; i++){
+                para_eliminar.push(data_sele_maquinaria[i])
+              }
+            }
+
+            if(data_sele_tarea.length>0){
+              for(var i=0 ;i<data_sele_tarea.length ; i++){
+                para_eliminar.push(data_sele_tarea[i]);
+              }
+            }
+  // Nexo 07 01
+            if(data_sele_intervencion.length>0){
+              for(var i=0 ; i<data_sele_intervencion.length ; i++){
+                para_eliminar.push(data_sele_intervencion[i]);
+              }
+            }
+
+            if(data_sele_usuarios.length>0){
+              for(var i=0 ; i<data_sele_usuarios.length ; i++){
+                para_eliminar.push(data_sele_usuarios[i]);
+              }
+            }
+            console.log(data_sele_usuarios);
+            console.log(para_eliminar);
+
+            fetch(usuariof.f_url+'/eliminar' ,{
+                method: 'POST',
+                body: JSON.stringify(para_eliminar),
+                headers:{'Content-Type': 'application/json'}
+            })
+            .then(retornoBorrar());
+
+          }
+
+          function retornoBorrar(){
+            console.log("-- retornoBorrar()-->[controlEliminar]")
+            // Nexo 25 borrar item maquinaria.
+            if(desplegado == true){
+              replegarMaquinaria();
+              desplegado = false;
+            }
+
+            if(desplegado_tarea){
+              replegarTarea();
+            }
+
+            if(vl_lu_desplegado){
+              replegarUsuarios();
+            }
+
+            para_eliminar= [];     
+          }
+        </script>
+        {{/if}}        
+        </div>
+      </div>
+
+      <!-- Sección Técnica ---------------------------->
+      <div name="tecnica">
+        {{#if permiso3}}
+        <div id="tecnica" class="collapse"> 
+          <p>Contenido de tecnica</p>
+          <hr>
+          <div class="row">
+            <div class="col-sm-4">
+              <button class="btn btn-success btn-lg" onclick="enServicio()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;En servicio&nbsp;&nbsp;&nbsp;&nbsp;   </button>
             </div>
             <div class="col-sm-4">
-                <br>
-                <button onclick="maquinariaNueva()" class="form-control btn btn-success">Agregar</button>
+              <button class="btn btn-warning btn-lg" onclick="cambiarEst()">&nbsp;Cambiar Estado&nbsp;</button>
+            </div>    
+            <div class="col-sm-4">
+              <button class="btn btn-danger  btn-lg" onclick="fueraDeServicio()">Fuera de servicio</button>
             </div>
+          </div>
+          <!-- Nexo 31 02 -->
+          <div id="tituloServicio"></div>
+          <div id="listaServicio"></div>
         </div>
+
+
+        <script>
+          var vl_tec_data;
+          // Nexo 28 01 Técnica
+          function fl_tec_Limpiar(){
+            document.getElementById('tituloServicio').innerHTML = "";
+            document.getElementById('listaServicio').innerHTML = "";
+          }
+          function enServicio(){
+            fl_tec_Limpiar();
+            console.log("--enServicio()-->[tecnica]");
+            document.getElementById('tituloServicio').innerHTML = "";
+            document.getElementById('listaServicio').innerHTML = "<div class='spinner-border text-warning'></div>"
+            //google.script.run.withSuccessHandler(r01_lisMaqSer).dameMaquinarias();
+            fetch(usuariof.f_url+'/dameMaquinarias')
+            .then(data=>data.json())
+            .then(data=>r01_lisMaqSer(data));
+          }
+
+          function fueraDeServicio(){
+            fl_tec_Limpiar();
+            console.log("--fueraDeServicio()-->[tecnica]");
+            document.getElementById('tituloServicio').innerHTML = "";
+            document.getElementById('listaServicio').innerHTML = "<div class='spinner-border text-warning'></div>"
+            //google.script.run.withSuccessHandler(r01_lisMaqFueSer).dameMaquinarias();
+            fetch(usuariof.f_url+'/dameMaquinarias')
+            .then(data=>data.json())
+            .then(data=>r01_lisMaqFueSer(data));          
+          }
+
+          function r01_lisMaqSer(data){
+            console.log("--r01_lisMaqSer(data)-->[tecnica]");
+            
+            vl_tec_data=data.filter(x=>x.disponible == true);
+            vl_tec_data.sort(function(a,b){if(a.nombre<b.nombre){return -1;}else if(a.nombre>b.nombre){return 1;}else{return 0};});
+            
+            console.log(data);
+            document.getElementById('tituloServicio').innerHTML = "<h4>Maquinaria en Servicio</h4>";
+            document.getElementById('listaServicio').innerHTML = dameCheckList(vl_tec_data,"paraCambiar");
+          }
+
+          function r01_lisMaqFueSer(data){
+            console.log("--r01_lisMaqFueSer(data)-->[tecnica]");
+            console.log(data);
+           
+            vl_tec_data=data.filter(x=>x.disponible == false);
+            vl_tec_data.sort(function(a,b){if(a.nombre<b.nombre){return -1;}else if(a.nombre>b.nombre){return 1;}else{return 0};});
+
+            console.log(data);
+            document.getElementById('tituloServicio').innerHTML = "<h4>Maquinaria Fuera de Servicio</h4>";      
+            document.getElementById('listaServicio').innerHTML = dameCheckList(vl_tec_data,"paraCambiar");
+          }
+          
+          function cambiarEst(){
+            console.log("--cambiarEst()-->[tecnica]");
+            // Nexo 31 03 Pedimos los items tildado
+            var vl_tec_cambiar = dameSelCkecklist(vl_tec_data,"paraCambiar");
+            console.log(vl_tec_cambiar);
+            for(var i=0 ; i<vl_tec_cambiar.length ; i++){
+              if(vl_tec_cambiar[i].disponible == false){
+                vl_tec_cambiar[i].disponible = true;
+              }else{
+                vl_tec_cambiar[i].disponible = false;
+              }
+            }
+            fl_tec_Limpiar();
+            
+            //google.script.run.withSuccessHandler(onSuccess).modificarObjetos("maquinaria",vl_tec_cambiar);
+            // Nexo 28 01 modificar objetos
+            var load = {};
+              load.coleccion = "maquinaria",
+              load.objeto = vl_tec_cambiar
+            
+            fetch(usuariof.f_url+'/modificarObjetos',{
+              method : 'POST',
+              body : JSON.stringify(load),
+              headers : {'Content-Type': 'application/json'}
+            })
+          }
+        </script>  
+        {{/if}}    
+
+      </div>
+      
+      <!-- Sección Intervención ----------------------->
+      <div name="intervencion">
+        {{#if permiso1}}
+        <div id="intervencion" class="collapse">
+          <br><br>
+          
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-8">
+                <input type="datetime-local" class="form-control" id="fechaInter" name="fechaInter" >
+              </div>
+              <div class="col-sm-4"> 
+                <button type="button" class="btn btn-warning form-control" onclick="definirFecha()">Definir Fecha</button>
+          
+              </div>
+            </div>
+          </div> 
+
+          <br>
+          <div id='salidaMaquinaria'></div >
+          <div id='salidaCapataz'></div >
+          <div id='salidaTarea'></div >
+          <hr>
+          <div class="form-group">
+            <div class="row">
+              <div class="col-sm-8">
+                <input type="text" class="form-control" id="nombrInter" name="nombrInter" >
+              </div>
+              <div class="col-sm-4"> 
+                <button type="button" class="btn btn-warning form-control" onclick="definirIntervencion()" id="definirIntervencion">Definir</button>
+              </div>
+            </div>
+          </div>
         </div>
 
         <script>
 
-        function maquinariaNueva(){
-            console.log("--maquinariaNueva()-->[maquinariaNueva]");
-            var maq = document.getElementById('input_maquinariaNueva').value;
+        var maqui_disp = [];  // Maquinarias disponibles
+        var str_maqui = "";   // String para salida por div html
+        
+        function definirFecha(){
+          console.log("--definirFecha() -->[intervencion]");
+          str_maqui = "";
+          document.getElementById('salidaMaquinaria').innerHTML = "<div class='spinner-border text-warning'></div>";
+          var fechaInter = document.getElementById('fechaInter').value;
 
-            //google.script.run.withSuccessHandler(limpiarInput).agregarMaquinaria(maq);
-            var objMaq = {nombre : maq};
-            var strObjMaq = JSON.stringify(objMaq);
-
-            fetch(usuariof.f_url+'/agregarMaquinaria' ,{
-                method: 'POST',
-                body: strObjMaq,
-                headers:{'Content-Type': 'application/json'}
-            })
-            .then(x=>console.log(x));
+          //google.script.run.withSuccessHandler(tengoMaquinarias).dameMaquinarias();
+          dameTodo();
         }
 
-        function limpiarInput(){
-            console.log("--limpiarInput()-->[maquinariaNueva]");    
-            document.getElementById('input_maquinariaNueva').value = "";
-            if(desplegado == true){
-            replegarMaquinaria();
-            maquinariaListar();
+        function dameTodo(){
+          //google.script.run.withSuccessHandler(repartir).dameTodo();
+          fetch(usuariof.f_url+'/dameTodo')
+          .then(data=>data.json())
+          .then((data)=>repartir(data));
+        }
+
+          var maqui = [];
+          var usua = [];
+          var tare = [];
+          var inter = [];
+          var capa = [];
+        function repartir(repData){
+          console.log(repData);
+          maqui = repData.maquinaria.sort(function(a,b){if(a.nombre<b.nombre){return -1;}else if(a.nombre>b.nombre){return 1;}else{return 0};});
+          usua = repData.usuarios;
+          tare = repData.tarea;
+          inter = repData.intervencion;
+          capa = usua.filter(x => x.rol == 'capataz');
+          tengoTodo();
+        }
+        function tengoTodo(){
+          console.log("-- tengoTodo(data)-->[intervencion]");
+
+          var fecha_futura_date = new Date(document.getElementById('fechaInter').value);
+        
+          var x_maqui = []; 
+          for(var k=0 ; k<inter.length ; k++){
+            if(mismoDia(fecha_futura_date,new Date(inter[k].fecha) )){
+              for(var j=0 ; j<inter[k].colMaq.length ; j++){
+                for(var i=0 ; i<maqui.length ; i++){
+                  if(inter[k].colMaq[j].id == maqui[i].id){
+                    x_maqui[i]="x";
+                  }
+                } 
+              }
             }
+          }
+          console.table(x_maqui)
+
+          maqui_disp = [];
+          for(var i = 0 ; i<maqui.length ; i++){ 
+            if(x_maqui[i] != "x"){
+              maqui_disp.push(maqui[i]);
+            }    
+          }
+
+          console.log("maqui_disp");
+          console.table(maqui_disp);
+        
+          //---------- salidaCapataz -------------------
+        
+          // extraigo los capataces ocupados ese día
+          var capa_ocupados = [];
+          for(var i=0 ; i<inter.length ; i++){
+            if(mismoDia(fecha_futura_date, new Date(inter[i].fecha))){
+              capa_ocupados.push(inter[i].capataz);
+            }
+          }
+
+          console.log("Capataces ocupados para este día");
+          console.table(capa_ocupados);
+
+          // Elimino los capataces ocupados ese día
+          for(var i=0 ; i<capa_ocupados.length ; i++){
+            for(var j=0 ; j<capa.length ; j++){
+              if(capa_ocupados[i].id == capa[j].id){
+                capa.splice(j,1);
+              }
+            }
+          }
+
+          console.log("capataces restantes");
+          console.table(capa);
+
+          if(capa.length>0){
+            document.getElementById('definirIntervencion').removeAttribute("disabled","false");    
+            var salCap = ""
+            for(var i=0 ; i<capa.length ; i++){
+              salCap = salCap + "<hr><p><input type='radio' class='form-check-input' name='capSel' id='capSel' value='"+i+"'>"+capa[i].user+"</p>"
+            }
+            document.getElementById('salidaCapataz').innerHTML = salCap;
+          }else{
+            document.getElementById('salidaCapataz').innerHTML = "<p>No hay capataces disponible</p>";
+            document.getElementById('definirIntervencion').setAttribute("disabled","true");
+          }
+
+          //document.getElementById('salidaMaquinaria').innerHTML = dameCheckList(maqui_disp,"maqSel");
+          document.getElementById('salidaMaquinaria').innerHTML = dameCheckListMarcada(maqui_disp,"maqSel",maqui_disp);
+          document.getElementById('salidaTarea').innerHTML = dameCheckList(tare,"tarSel");
+
+
+        }
+
+
+        var capa_x = [];
+            
+        //--------------------------------------------------
+        function definirIntervencion(){
+          console.log("-- definirIntervencion()-->[intervencion]");
+        
+          try{
+            if(document.getElementById('nombrInter').value != ""){
+              var unaIntervencion = {};
+              unaIntervencion.nombre = document.getElementById('nombrInter').value;
+              //unaIntervencion.colMaq = array_maquinaria;
+              unaIntervencion.colMaq = dameSelCkecklist(maqui_disp,'maqSel');
+              unaIntervencion.fecha = document.getElementById('fechaInter').value;
+              unaIntervencion.capataz = valorRadio(capa,'capSel');
+              unaIntervencion.colTar = dameSelCkecklist(tare, 'tarSel');
+              document.getElementById('salidaMaquinaria').innerHTML = "";
+              document.getElementById('salidaCapataz').innerHTML = "";
+              document.getElementById('salidaTarea').innerHTML = "";
+              document.getElementById('nombrInter').value = "";
+              // Nexo 31 01
+              //google.script.run.withSuccessHandler(onSuccess).agregarIntervencion(unaIntervencion);
+
+              fetch(usuariof.f_url+'/agregarIntervencion',{
+                method : 'POST',
+                body : JSON.stringify(unaIntervencion),
+                headers : {'Content-Type': 'application/json'}
+              })
+
+            }else{
+              alert("Coloque nombre a la intervención");
+            }
+
+          }catch(err){
+            alert("Hubo un error!");
+            console.log(err);
+          }
         }
         </script>
+        {{/if}}
+      </div>
 
-    {{/ifeq}} 
-  </div>
+      <!-- Sección Intervenciones ----------------------->
+      <div name="intervenciones">
+        {{#if permiso2}}
+        <div id="intervenciones" class='collapse'>
 
-  <!-- Nexo cu 01 Listar maquinaria ---------------------------- -->  
-  <div name="maquinariaListar">          
-      <p>Aquí va maquinariaListar.html</p>
-      <hr>
-      <div class="row">
-          <div class="col-sm-8">
-              <button onclick="maquinariaListar()" class="form-control btn btn-success" >Listar Maquinaria</button>
+          <p>Listado de Intervenciones</p>
+          <div id="print">
+            <div class="spinner-border text-warning"></div>
           </div>
-          <div id="maquinariaListar_out"></div>
+          
+          <script>
+
+          var data_sele_intervencion = [];
+          var data_intervencion = [];           // Intervenciones en función del rol
+          var desplegado_intervencion = false;
+
+          function btn_listar(){
+
+          //google.script.run.withSuccessHandler(listarInterv).dameTodo();
+          // Nexo 30 01
+          fetch(usuariof.f_url+'/dameTodo')
+            .then(data=>data.json())
+            .then((data)=>listarInterv(data));
+
+          }
+
+          function listarInterv(data_li){
+          console.log("--listarInterv(interv)-->[intervencionListar.htm.]");
+
+            console.log(data_li);
+          var interv = data_li.intervencion;
+
+          console.log("Intervención: ");
+          console.log(interv);
+          console.log("Maquinarias de la intervención: ");
+          var vl_iL_maqui = data_li.maquinaria;
+          console.log(vl_iL_maqui);
+
+          console.log("Colección de maquinarias:");
+          console.log(data_li.maquinaria)
+
+          //ordeno la colección según la fecha
+          interv.sort(function(a,b){
+          if(a.fecha<b.fecha){
+          return -1;
+          }else if(a.fecha>b.fecha){
+          return 1;
+          }else{
+          return 0;
+          }
+          });
+
+          console.log(usuariof);
+          console.log(interv);
+
+          // muestra a solo interesados
+          if(usuariof.rol == 'administrador' || usuariof.rol == 'mecánico'){
+          data_intervencion = interv;
+          }else{
+          //console.log(x.capataz+" "+usuariof.rol);
+          data_intervencion = interv.filter(x=>x.capataz.user == usuariof.user);
+          }
+
+          document.getElementById("print").innerHTML = "";
+
+          var pt2 = "";
+          for(var i=0 ; i<data_intervencion.length ; i++){
+            pt2 += "<p>"+"<input type='checkbox' class='form-check-input' onclick='intervencion("+i+")'>&nbsp;"+dameDia(data_intervencion[i].fecha)+" - "+data_intervencion[i].nombre+" - "+data_intervencion[i].capataz.user+"</p>";
+            pt2 += dameListaMarcada(data_intervencion[i].colMaq, vl_iL_maqui);
+            pt2 += "<hr>";
+            pt2 += dameCheckList(data_intervencion[i].colTar, 'tarea');
+            pt2 += "<hr>";
+          }
+
+          //document.getElementById("print").innerHTML = print_total ;
+          document.getElementById("print").innerHTML = pt2;
+          /**/ 
+          }
+
+          function intervencion(A){
+          console.log("--intervencion(A)-->[intervencionListar()]");
+          if(!repetido(data_sele_intervencion,data_intervencion[A].id)){
+          data_sele_intervencion.push(data_intervencion[A]);
+          }else{
+          data_sele_intervencion = eliminar(data_sele_intervencion,data_intervencion[A].id);
+          }
+          }
+
+          function replegarIntervencion(){
+          console.log("--replegarIntervencion()-->[intervencionListar]");
+          document.getElementById('print').innerHTML = "";
+          data_sele_intervencion = [];
+          desplegado_intervencion = false;
+          }
+          </script>
+
+        </div>
+        {{/if}}
       </div>
+    </div> 
 
-      <script>
-
-      var data_sele_maquinaria = [];  // Maquinara seleccionada para ser elimnada
-      var data_maquinaria = [];       // Colección Maquinaria
-      var desplegado = false;
-
-      function maquinariaListar(){
-          console.log("--maquinariaListar() -->[maquinariaListar]");
-          if(desplegado == false){
-              document.getElementById('maquinariaListar_out').innerHTML = "<div class='spinner-border text-warning'></div>"
-              //google.script.run.withSuccessHandler(listarMaquinaria).dameMaquinarias();
-              fetch(usuariof.f_url+'/dameMaquinarias')
-              .then(data=>data.json())
-              .then(data=>listarMaquinaria(data));
-              
-          }else{
-              //document.getElementById('maquinariasListar_out').innerHTML = "";
-              
-          }
+      <!-- ?!=include('style.html')?-->
+    <style>
+      body {
+        background : #aaffaa;
       }
+    </style>
 
-      function listarMaquinaria(data){
-          console.log("-- listarMaquinaria(data)-->[maquinariaListar()]");
-          console.log(data);
-          data_maquinaria = data;
-          if(!desplegado){
-              var str = "";
-              for(var i=0 ; i<data.length ; i++){
-                  str = str + "<label><input type='checkbox' class='form-check-input' name='maquinaria' onclick='maquinaria("+i+")'>"+data[i].nombre+"</label><hr>";
-              }
-              document.getElementById('maquinariaListar_out').innerHTML = str;
-              desplegado = true;
-          }else{
-              replegarMaquinaria();
-              
-          };
-      }
-
-      function replegarMaquinaria(){
-          console.log("-- replegarMaquinaria()-->[maquinariaListar]");
-          document.getElementById('maquinariaListar_out').innerHTML = "";
-          data_sele_maquinaria = [];
-          desplegado = false; 
-      }
-
-      function maquinaria(A){
-          console.log("-- maquinaria(A)-->[maquinariaListar]")
-          // A posición seleccionada del vector data_maquinaria
-          // Si el id de la posición A no está repetido en el vector data_sele_maquinaria,
-          // lo agrega, sinó lo borra
-          if(!repetido(data_sele_maquinaria, data_maquinaria[A].id)){
-          data_sele_maquinaria.push(data_maquinaria[A])      
-          }else{
-          data_sele_maquinaria = eliminar(data_sele_maquinaria,data_maquinaria[A].id);
-          }
-      }
-
-      </script>
-  </div>
-
-    <!-- --------------------------------------------------------- -->
-      <? if(usuariof.rol == "administrador"){ ?>
-      <?!=include('usuarioNuevo.html') ?>
-  <div name="usuarioListar">
-    <hr>
-  <div class="row">
-    <div class="col-sm-8">
-      <button onclick="usuarioListar()" class="form-control btn btn-success" >Listar Usuarios</button>
-    </div>
-    <div id="usuarioListar_out"></div>
-  </div>
-  <script>
-    // cu_ul
-
-    var vl_lu_desplegado = false;
-    var data_sele_usuarios = [];
-
-    function usuarioListar(){
-      console.log("-- usuarioListar()-->[usuarioListar]");
-      if(vl_lu_desplegado == false){
-        document.getElementById('usuarioListar_out').innerHTML = "<div class='spinner-border text-warning'></div>"
-        google.script.run.withSuccessHandler(listarUsuario).dameUsuarios();
-      }else{
-        listarUsuario();
-      }
-    }
-
-    function listarUsuario(data){
-      console.log("-- listarUsuario(data)-->[usuarioListar()]")
-      data_usuarios = data;
-      if(!vl_lu_desplegado){
-        var str = "";
-        for(var i=0 ; i<data.length ; i++){
-          str = str + "<hr><label><input type='checkbox' class='form-check-input' name='usuario' onclick='usuario("+i+")'>&nbsp;"+data[i].user+"&nbsp;rol:&nbsp;"+data[i].rol+"</label>";
-        }
-        document.getElementById('usuarioListar_out').innerHTML = str;
-        vl_lu_desplegado = true;
-      }else{
-        replegarUsuarios()
-      };
-    }
-
-    function replegarUsuarios(){
-      console.log("-- replegarUsuarios()-->[usuarioListar]");
-      document.getElementById('usuarioListar_out').innerHTML = "";
-      data_sele_usuarios = [];
-      vl_lu_desplegado = false; 
-    }
-
-    function usuario(A){
-      console.log("-- usuario(A)-->[usuarioListar]")
-      // A posición seleccionada del vector data_usuarios
-      // Si el id de la posición A no está repetido en el vector data_sele_usuarios,
-      // lo agrega, sinó lo borra
-      if(!repetido(data_sele_usuarios, data_usuarios[A].id)){
-        data_sele_usuarios.push(data_usuarios[A])     
-      
-      }else{
-        data_sele_usuarios = eliminar(data_sele_usuarios,data_usuarios[A].id);
-      }
-        console.log(data_sele_usuarios);    
-    }
-
-  </script>
-
-  </div>    
-      <? } ?> 
-      <? if(usuariof.rol == "administrador"){ ?>
-      <?!=include('tareaNueva.html') ?>        
-      <? } ?>
-
-  <div name="tareaListar">
-    <hr>
-    <div class="row">
-      <div class="col-sm-8">
-        <button onclick="tareaListar()" class="form-control btn btn-success" >Listar Tarea</button>
-      </div>
-      <div id="tareaListar_out"></div>
-    </div>
-
-    <script>
-
-      var data_sele_tarea = [];
-      var data_tarea = [];
-      var desplegado_tarea = false;  
-
-      function tareaListar(){
-        console.log("-- tareaListar()-->[tareaListar()]");
-        if(!desplegado_tarea){
-          document.getElementById('tareaListar_out').innerHTML = "<div class='spinner-border text-warning'></div>"
-          google.script.run.withSuccessHandler(listarTarea).dameTareas();
-        }else{
-          listarTarea();
-        }
-      }
-
-      function listarTarea(data){
-        console.log("-- listarTarea(data)-->[tareaListar()]");
-        data_tarea = data;
-        if(!desplegado_tarea){
-          var str = "";
-          for(var i=0 ; i<data.length ; i++){
-            str = str + "<label><input type='checkbox' name='tarea' class='form-check-input' onclick='tarea("+i+")'>"+data[i].nombre+"</label><hr>";
-          }
-          document.getElementById('tareaListar_out').innerHTML = str;
-          desplegado_tarea = true;
-        }else{
-          document.getElementById('tareaListar_out').innerHTML = "";
-          desplegado_tarea = false;
-        }
-
-      }
-
-      function replegarTarea(){
-        console.log("-- replegarTarea()-->[tareaListar]")
-        document.getElementById("tareaListar_out").innerHTML = "";
-        data_sele_tarea = [];
-        desplegado_tarea = false;
-      }
-
-      function tarea(A){
-        console.log("-- tarea(A)-->[tareaListar()]");
-        if(!repetido(data_sele_tarea, data_tarea[A].id)){
-          data_sele_tarea.push(data_tarea[A])      
-        }else{
-          data_sele_tarea = eliminar(data_sele_tarea,data_tarea[A].id);
-        }
-      }
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
     </script>
-  </div>
-           
 
-      <?!=include('js_Contenedor.html') ?>
-</div>
+    <div name="temp_footer">
+        <hr>
+        <footer>
+        <br>
+        <h2>core.central.soft</h2>
+        <p id='miEtiqueta'></p>
+        <br>
+        </footer>
 
-<!-- Sección Eliminar -------------------------->
-<div id="eliminar" class="collapse">
-  <p>Contenido de eliminar</p>
-  
-  <script>
-
-    var para_eliminar = [];
-    /**
-    * Elimina lo que esté almacenado en los vectore data_sele_xxx
-    */
-
-    function eliminarx(){
-      console.log("-- eliminarx()-->[controlEliminar]")
-
-      if(data_sele_maquinaria.length>0){
-        for(var i=0 ; i<data_sele_maquinaria.length ; i++){
-          para_eliminar.push(data_sele_maquinaria[i])
+        <style>
+        footer {
+        background : green;
+        color : white;
+        text-align : center;
         }
-      }
-      /* 
-      if(data_sele_capataz.length>0){
-        for(var i=0 ;i<data_sele_capataz.length ;i++){
-          para_eliminar.push(data_sele_capataz[i]);
-        }
-      }
-      */
-      if(data_sele_tarea.length>0){
-        for(var i=0 ;i<data_sele_tarea.length ; i++){
-          para_eliminar.push(data_sele_tarea[i]);
-        }
-      }
+        </style>
 
-      if(data_sele_intervencion.length>0){
-        for(var i=0 ; i<data_sele_intervencion.length ; i++){
-          para_eliminar.push(data_sele_intervencion[i]);
-        }
-      }
-      console.log(data_sele_usuarios);
-
-      if(data_sele_usuarios.length>0){
-        for(var i=0 ; i<data_sele_usuarios.length ; i++){
-          para_eliminar.push(data_sele_usuarios[i]);
-        }
-      }
-
-      console.log(para_eliminar);
-
-      //google.script.run.withSuccessHandler(retornoBorrar).eliminar(para_eliminar);
-
-      fetch(usuariof.f_url+'/eliminar' ,{
-          method: 'POST',
-          body: JSON.stringify(para_eliminar),
-          headers:{'Content-Type': 'application/json'}
-      })
-      .then(x=>console.log(x));
-
-    }
-
-    function retornoBorrar(){
-      console.log("-- retornoBorrar()-->[controlEliminar]")
-
-      if(desplegado == true){
-        replegarMaquinaria();
-      }
-      /* 
-      if(desplegado_capataz == true){
-        replegarCapataz();
-      }
-      */
-      if(desplegado_tarea){
-        replegarTarea();
-      }
-  /* */
-      if(vl_lu_desplegado){
-        replegarUsuarios();
-      }
-
-      para_eliminar= [];     
-    }
-
-
-  </script>
-    
-  <? } ?>          
-</div>
-
-  <!-- Sección Técnica ---------------------------->
-  <div name="tecnica">
-    <div id="tecnica" class="collapse"> 
-      <p>Contenido de tecnica</p>
-      <hr>
-      <div class="row">
-        <div class="col-sm-4">
-          <button class="btn btn-success btn-lg" onclick="enServicio()">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;En servicio&nbsp;&nbsp;&nbsp;&nbsp;   </button>
-        </div>
-        <div class="col-sm-4">
-          <button class="btn btn-warning btn-lg" onclick="cambiarEst()">&nbsp;Cambiar Estado&nbsp;</button>
-        </div>    
-        <div class="col-sm-4">
-          <button class="btn btn-danger  btn-lg" onclick="fueraDeServicio()">Fuera de servicio</button>
-        </div>
-      </div>
-      
-      <div id="tituloServicio"></div>
-      <div id="listaServicio"></div>
-
-      <script>
-        var vl_tec_data;
-
-        function fl_tec_Limpiar(){
-          document.getElementById('tituloServicio').innerHTML = "";
-          document.getElementById('listaServicio').innerHTML = "";
-        }
-        function enServicio(){
-          fl_tec_Limpiar();
-          console.log("--enServicio()-->[tecnica]");
-          document.getElementById('tituloServicio').innerHTML = "";
-          document.getElementById('listaServicio').innerHTML = "<div class='spinner-border text-warning'></div>"
-          google.script.run.withSuccessHandler(r01_lisMaqSer).dameMaquinarias();
-        }
-        function fueraDeServicio(){
-          fl_tec_Limpiar();
-          console.log("--fueraDeServicio()-->[tecnica]");
-          document.getElementById('tituloServicio').innerHTML = "";
-          document.getElementById('listaServicio').innerHTML = "<div class='spinner-border text-warning'></div>"
-          google.script.run.withSuccessHandler(r01_lisMaqFueSer).dameMaquinarias();
-        }
-
-        function r01_lisMaqSer(data){
-          console.log("--r01_lisMaqSer(data)-->[tecnica]");
-          vl_tec_data=data;
-          console.log(data);
-          data = data.filter(x=>x.disponible == true);
-          console.log(data);
-          document.getElementById('tituloServicio').innerHTML = "<h4>Maquinaria en Servicio</h4>";
-          document.getElementById('listaServicio').innerHTML = dameCheckList(data,"paraCambiar");
-        }
-
-        function r01_lisMaqFueSer(data){
-          console.log("--r01_lisMaqFueSer(data)-->[tecnica]");
-          console.log(data);
-          data = data.filter(x=>x.disponible == false);
-          vl_tec_data=data;      
-          console.log(data);
-          document.getElementById('tituloServicio').innerHTML = "<h4>Maquinaria Fuera de Servicio</h4>";      
-          document.getElementById('listaServicio').innerHTML = dameCheckList(vl_tec_data,"paraCambiar");
-        }
-        
-        function cambiarEst(){
-          console.log("--cambiarEst()-->[tecnica]");
-          // Pedimos los items tildado
-          var vl_tec_cambiar = dameSelCkecklist(vl_tec_data,"paraCambiar");
-          console.log(vl_tec_cambiar);
-          for(var i=0 ; i<vl_tec_cambiar.length ; i++){
-            if(vl_tec_cambiar[i].disponible == false){
-              vl_tec_cambiar[i].disponible = true;
-            }else{
-              vl_tec_cambiar[i].disponible = false;
-            }
-          }
-          fl_tec_Limpiar();
-          
-          google.script.run.withSuccessHandler(onSuccess).modificarObjetos("maquinaria",vl_tec_cambiar);
-
-        }
-
-
-      </script>
-    </div>       
-  </div>
-<!-- Sección Intervención ----------------------->
-  <div name="intervencion">
-    <div id="intervencion" class="collapse">
-      <br><br>
-      
-      <div class="form-group">
-        <div class="row">
-          <div class="col-sm-8">
-            <input type="datetime-local" class="form-control" id="fechaInter" name="fechaInter" >
-          </div>
-          <div class="col-sm-4"> 
-            <button type="button" class="btn btn-warning form-control" onclick="definirFecha()">Definir Fecha</button>
-      
-          </div>
-        </div>
-      </div> 
-
-      <br>
-      <div id='salidaMaquinaria'></div >
-      <div id='salidaCapataz'></div >
-      <div id='salidaTarea'></div >
-      <hr>
-      <div class="form-group">
-        <div class="row">
-          <div class="col-sm-8">
-            <input type="text" class="form-control" id="nombrInter" name="nombrInter" >
-          </div>
-          <div class="col-sm-4"> 
-            <button type="button" class="btn btn-warning form-control" onclick="definirIntervencion()" id="definirIntervencion">Definir</button>
-          </div>
-        </div>
-      </div>
-
-      <script>
-
-      var maqui_disp = [];  // Maquinarias disponibles
-      var str_maqui = "";   // String para salida por div html
-      
-      function definirFecha(){
-        console.log("--definirFecha() -->[intervencion]");
-        str_maqui = "";
-        document.getElementById('salidaMaquinaria').innerHTML = "<div class='spinner-border text-warning'></div>";
-        var fechaInter = document.getElementById('fechaInter').value;
-
-        //google.script.run.withSuccessHandler(tengoMaquinarias).dameMaquinarias();
-        dameTodo();
-      }
-
-      function dameTodo(){
-        google.script.run.withSuccessHandler(repartir).dameTodo();
-      }
-
-        var maqui = [];
-        var usua = [];
-        var tare = [];
-        var inter = [];
-        var capa = [];
-      function repartir(repData){
-        console.log(repData);
-        maqui = repData[0];
-        usua = repData[1];
-        tare = repData[2];
-        inter = repData[3];
-        capa = usua.filter(x => x.rol == 'capataz');
-        tengoTodo();
-      }
-      function tengoTodo(){
-        console.log("-- tengoTodo(data)-->[intervencion]");
-
-        var fecha_futura_date = new Date(document.getElementById('fechaInter').value);
-      
-        var x_maqui = []; 
-        for(var k=0 ; k<inter.length ; k++){
-          if(mismoDia(fecha_futura_date,new Date(inter[k].fecha) )){
-            for(var j=0 ; j<inter[k].colMaq.length ; j++){
-              for(var i=0 ; i<maqui.length ; i++){
-                if(inter[k].colMaq[j].id == maqui[i].id){
-                  x_maqui[i]="x";
-                }
-              } 
-            }
-          }
-        }
-        console.table(x_maqui)
-
-        maqui_disp = [];
-        for(var i = 0 ; i<maqui.length ; i++){ 
-          if(x_maqui[i] != "x"){
-            maqui_disp.push(maqui[i]);
-          }    
-        }
-
-        console.log("maqui_disp");
-        console.table(maqui_disp);
-      
-        //---------- salidaCapataz -------------------
-      
-        // extraigo los capataces ocupados ese día
-        var capa_ocupados = [];
-        for(var i=0 ; i<inter.length ; i++){
-          if(mismoDia(fecha_futura_date, new Date(inter[i].fecha))){
-            capa_ocupados.push(inter[i].capataz);
-          }
-        }
-
-        console.log("Capataces ocupados para este día");
-        console.table(capa_ocupados);
-
-        // Elimino los capataces ocupados ese día
-        for(var i=0 ; i<capa_ocupados.length ; i++){
-          for(var j=0 ; j<capa.length ; j++){
-            if(capa_ocupados[i].id == capa[j].id){
-              capa.splice(j,1);
-            }
-          }
-        }
-
-        console.log("capataces restantes");
-        console.table(capa);
-
-        if(capa.length>0){
-          document.getElementById('definirIntervencion').removeAttribute("disabled","false");    
-          var salCap = ""
-          for(var i=0 ; i<capa.length ; i++){
-            salCap = salCap + "<hr><p><input type='radio' class='form-check-input' name='capSel' id='capSel' value='"+i+"'>"+capa[i].user+"</p>"
-          }
-          document.getElementById('salidaCapataz').innerHTML = salCap;
-        }else{
-          document.getElementById('salidaCapataz').innerHTML = "<p>No hay capataces disponible</p>";
-          document.getElementById('definirIntervencion').setAttribute("disabled","true");
-        }
-
-        //document.getElementById('salidaMaquinaria').innerHTML = dameCheckList(maqui_disp,"maqSel");
-        document.getElementById('salidaMaquinaria').innerHTML = dameCheckListMarcada(maqui_disp,"maqSel",maqui_disp);
-        document.getElementById('salidaTarea').innerHTML = dameCheckList(tare,"tarSel");
-
-
-      }
-
-
-      var capa_x = [];
-          
-      //--------------------------------------------------
-      function definirIntervencion(){
-        console.log("-- definirIntervencion()-->[intervencion]");
-      
-        try{
-          if(document.getElementById('nombrInter').value != ""){
-            var unaIntervencion = {};
-            unaIntervencion.nombre = document.getElementById('nombrInter').value;
-            //unaIntervencion.colMaq = array_maquinaria;
-            unaIntervencion.colMaq = dameSelCkecklist(maqui_disp,'maqSel');
-            unaIntervencion.fecha = document.getElementById('fechaInter').value;
-            unaIntervencion.capataz = valorRadio(capa,'capSel');
-            unaIntervencion.colTar = dameSelCkecklist(tare, 'tarSel');
-            document.getElementById('salidaMaquinaria').innerHTML = "";
-            document.getElementById('salidaCapataz').innerHTML = "";
-            document.getElementById('salidaTarea').innerHTML = "";
-            document.getElementById('nombrInter').value = "";
-            google.script.run.withSuccessHandler(onSuccess).agregarIntervencion(unaIntervencion);
-          }else{
-            alert("Coloque nombre a la intervención");
-          }
-
-        }catch(err){
-          alert("Hubo un error!");
-          console.log(err);
-        }
-      }
-      </script>
+        <script>
+        document.getElementById("miEtiqueta").innerHTML = "&copy;"+" 2023";
+        </script>
     </div>
-  </div>
-<!-- Sección Intervenciones ----------------------->
-
-  <div id="intervenciones" class='collapse'>
-    <? if(usuariof.rol == "administrador" || usuariof.rol == "capataz" || usuariof.rol == "mecánico"){ ?>
-    <div name="intervenciones">
-      <div class="form-group">
-      <div class="row">
-      <div class="col-sm-12">
-
-      </div>
-      </div>
-      </div>
-      <p>Listado de Intervenciones</p>
-      <div id="print">
-      <div class="spinner-border text-warning"></div>
-      </div>
-
-
-
-
+    
+    <div name="js_consumidor">
       <script>
+        // Nexo 31 03 
+        function dameSelCkecklist(col, checkListName){
+          var clsel = document.getElementsByName(checkListName);
+          var clsel_res = []
+          for(var i=0 ; i<clsel.length ; i++){
+            if(clsel[i].checked){
+              clsel_res.push(col[i]);
+            }
+          }
+          return clsel_res;
+        } 
 
-      var data_sele_intervencion = [];
-      var data_intervencion = [];
-      var desplegado_intervencion = false;
-
-      function btn_listar(){
-
-      google.script.run.withSuccessHandler(listarInterv).dameTodo();
-
-      }
-
-      function listarInterv(data_li){
-      var interv = data_li[3]
-      var vl_iL_maqui = data_li[0]
-      console.log("--listarInterv(interv)-->[intervencionListar.htm.]");
-      console.log(data_li);
-
-      //ordeno la colección según la fecha
-      interv.sort(function(a,b){
-      if(a.fecha<b.fecha){
-      return -1;
-      }else if(a.fecha>b.fecha){
-      return 1;
-      }else{
-      return 0;
-      }
-      });
-
-      console.log(usuariof);
-      console.log(interv);
-
-      if(usuariof.rol == 'administrador' || usuariof.rol == 'mecánico'){
-      data_intervencion = interv;
-      }else{
-      //console.log(x.capataz+" "+usuariof.rol);
-      data_intervencion = interv.filter(x=>x.capataz.user == usuariof.user);
-      }
-
-      document.getElementById("print").innerHTML = "";
-
-      var pt2 = "";
-      for(var i=0 ; i<data_intervencion.length ; i++){
-      pt2 += "<p>"+"<input type='checkbox' class='form-check-input' onclick='intervencion("+i+")'>&nbsp;"+dameDia(data_intervencion[i].fecha)+" - "+data_intervencion[i].nombre+" - "+data_intervencion[i].capataz.user+"</p>";
-      pt2 += dameListaMarcada(data_intervencion[i].colMaq, vl_iL_maqui);
-      pt2 += "<hr>";
-      pt2 += dameCheckList(data_intervencion[i].colTar, 'tarea');
-      pt2 += "<hr>";
-      }
-
-      //document.getElementById("print").innerHTML = print_total ;
-      document.getElementById("print").innerHTML = pt2;
-      /**/ 
-      }
-
-      function intervencion(A){
-      console.log("--intervencion(A)-->[intervencionListar()]");
-      if(!repetido(data_sele_intervencion,data_intervencion[A].id)){
-      data_sele_intervencion.push(data_intervencion[A]);
-      }else{
-      data_sele_intervencion = eliminar(data_sele_intervencion,data_intervencion[A].id);
-      }
-      }
-
-      function replegarIntervencion(){
-      console.log("--replegarIntervencion()-->[intervencionListar]");
-      document.getElementById('print').innerHTML = "";
-      data_sele_intervencion = [];
-      desplegado_intervencion = false;
-      }
+        function valorRadio(radioCol,radioName){ 
+          try {
+            var miRadio = document.getElementsByName(radioName);
+            console.log(miRadio[0].checked);
+            var i_ = -1;
+            do{
+              i_ = i_ + 1;
+            }while(miRadio[i_].checked == false);
+            return radioCol[i_];  
+          }
+          catch(err) {
+            return err;
+          }
+        }
 
       </script>
-    </div>       
-    <? } ?>
-</div>
-</div>
-
-    <!-- ?!=include('style.html')?-->
-<style>
-  body {
-    background : #aaffaa;
-  }
-</style>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
-  integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous">
-  </script>
-    <!-- -->
-    <?!=include('temp_footer.html') ?>    
-    <?!=include('js_consumidor.html') ?>
+    </div>  
+    
   </body>
 </html>
