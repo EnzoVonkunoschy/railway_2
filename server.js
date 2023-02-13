@@ -3,6 +3,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const Modelo = require('./modelo.js');
+const Sec = require('./seguridad.js');
 
 const app = express();
 
@@ -10,6 +11,8 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}));
+
+app.use("/images", express.static(path.join(__dirname, "/public/images")));
 
 const Handlebars = require("handlebars");
 
@@ -51,26 +54,62 @@ app.get('/', (req, res) => {
     res.send(salida);
 });
 
-app.post('/', (req, res) => {
+// sin operación
+app.post('/',(req, res)=>{
     var objeto = {user : req.body.user,
+        pass: req.body.pass,
+        url : _url};
+ 
+    Sec.getContenedor(objeto)
+        .then((data)=>res.send(data));
+/*     
+        res.send("<p>Hola desde server</p>");*/
+
+})
+
+app.post('/xxx', (req, res) => {
+    var objeto1 = {user : req.body.user,
                     pass: req.body.pass,
-                    rol: "administrador",
-                    submit : req.body.submit,
-                    url : _url};
-     var archivo = fs.readFileSync('paginas/contenedor.hbs','utf-8',(err,data)=>{
-        if(err){
-            console.log(err);         
+                    //rol: "administrador",
+                    //submit : req.body.submit,
+                    //url : _url,
+                    //permiso1 :true,
+                    //permiso2 : true
+                };
+    Sec.validar(objeto1).then((data)=>{
+        if(data){
+            Sec.dameUsuario(objeto1).then((usua)=>{
+            var archivo = fs.readFileSync('paginas/contenedor.hbs','utf-8',(err,data)=>{
+                if(err){
+                    console.log(err);         
+                }else{
+                    console.log("archivo leído");
+                }
+            });
+
+            valPer1 = false; valPer2 = false; valPer3 = false; valPer4 = false; valPer5 = false;
+            if(usua.rol == "administrador"){valPer1 = true};
+            if(usua.rol == "administrador" || usua.rol == "capataz" || usua.rol == "mecánico" || usua.rol == "invitado"){valPer2 = true};
+            if(usua.rol == "administrador" || usua.rol == "mecánico"){valPer3 = true };
+
+
+            var objeto2 = {user : usua.user,
+                            rol : usua.rol,
+                            url : _url,
+                            permiso1 : valPer1,
+                            permiso2 : valPer2,
+                            permiso3 : valPer3}
+            var template = Handlebars.compile(archivo);
+            var salida = template(objeto2);
+            res.send(salida);})            
         }else{
-            console.log("archivo leído");
+            res.send("<p>...ops!!</p>");
         }
-    });
-    var template = Handlebars.compile(archivo);
-    var salida = template(objeto);
-    res.send(salida);
+    })
 });
 
 
-//--- Api ----------------------------------------------------
+//--- get ----------------------------------------------------
 
 app.get('/dameMaquinarias',(req,res)=>{
     console.log("--/dameMaquinarias-->[server.js]");
@@ -79,19 +118,64 @@ app.get('/dameMaquinarias',(req,res)=>{
     Modelo.dameMaquinarias().
     then((maq)=>res.status(200).send(maq));
 });
+// Nexo 25 02 
+app.get('/dameUsuarios',(req, res)=>{
+    console.log("--/dameUsuarios-->[server.js]");
+    Modelo.dameUsuarios().
+    then((usu)=>res.status(200).send(usu));
+});
+
+app.get('/dameTodo',(req, res)=>{
+    console.log("--/dameTodo-->[server.js]")
+    Modelo.dameTodo()
+    //.then((todo)=>console.log(todo));
+    .then((todo)=>res.status(200).send(todo));
+})
+
+//--- post ---------------------------------------------------------
+
+// Nexo 27 01 
+app.post('/agregarTarea',(req, res)=>{
+    console.log(req.body);
+    Modelo.agregarTarea(req.body.nombre);
+    res.status(200).send(req.body);
+})
 
 app.post('/agregarMaquinaria',(req,res)=>{
-   
     console.log(req.body);
     Modelo.agregarMaquinaria(req.body.nombre);
     res.status(200).send(req.body);
 });
-
-app.post('/eliminar',(req,res)=>{
+// Nexo 25 01 agregar usuario
+app.post('/agregarUsuario',(req, res)=>{
+    console.log("--/agregarUsuario-->[server.js]");
     console.log(req.body);
-    Modelo.eliminarMaquinaria(req.body);
+    Modelo.agregarUsuario(req.body);
+    res.status(200).send(req.body);
+})
+// Nexo 26 01 eliminar usuario
+app.post('/eliminar',(req,res)=>{
+    Modelo.eliminar(req.body);
 });
 
+// Nexo 31 01
+app.post('/agregarIntervencion',(req, res)=>{
+    console.log(req.body);
+    Modelo.agregarIntervencion(req.body);
+})
+
+function eliminarIdCol(coleccion,id_eliminar){
+var nuevaColeccion = coleccion.filter(x=>x.id != id_eliminar)
+return nuevaColeccion
+}
+  
+  //-------------------------------------------
+  //function modificarObjetos(col_obj,objetos){
+    // Nexo 28 01 
+app.post('/modificarObjetos',(req, res)=>{
+    Modelo.modificar(req.body.objeto, req.body.coleccion)
+    .then(res.status(200).send("ok"));
+});
 
 
 
